@@ -1,1 +1,53 @@
+- name: Enable CRB repository on AlmaLinux 9
+  ansible.builtin.dnf:
+    name: almalinux-release-synergy # Provides repo configurations if missing
+    state: present
+
+- name: Ensure CRB repository is explicitly enabled
+  ansible.builtin.ini_file:
+    path: /etc/yum.repos.d/almalinux-crb.repo
+    section: crb
+    option: enabled
+    value: "1"
+    mode: '0644'
+
+- name: Clean cache and install libcgroup-tools from CRB
+  ansible.builtin.dnf:
+    name: libcgroup-tools
+    state: present
+    enablerepo: crb
+    update_cache: yes
+
+# Download and extract Docker CRI.
+- name: Download and extract Docker CRI
+  ansible.builtin.unarchive:
+    src: "{{download_url}}"
+    dest: /tmp
+    owner: root
+    group: root
+    remote_src: yes
+    creates: "{{archive_path}}"
+  vars:
+    # Changed matching logic from 'arm64' to 'aarch64' to correctly capture Enterprise Linux architecture variables
+    architecture: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+    release_version: "{{docker_cri.release_version}}"
+    download_url: "https://github.com/Mirantis/cri-dockerd/releases/download/v{{release_version}}/cri-dockerd-{{release_version}}.{{architecture}}.tgz"
+    archive_path: "/tmp/cri-dockerd-{{release_version}}.{{architecture}}.tgz"
+  tags:
+    - setup
+
+# Install Docker CRI.
+- name: Install Docker CRI
+  ansible.builtin.copy:
+    src: "{{source_dir}}/cri-dockerd"
+    dest: /usr/bin/cri-dockerd
+    owner: root
+    group: root
+    mode: 0755
+    backup: false
+    remote_src: true
+  vars:
+    source_dir: /tmp/cri-dockerd
+  tags:
+    - setup
 
