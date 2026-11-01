@@ -4,11 +4,11 @@
     name: libcgroup
     disable_gpg_check: true
     state: present
-  vars:
-    architecture: "{{'aarch64' if ansible_architecture == 'aarch64' else 'x86_64'}}"
-    cgroup_release_version: "{{docker_cri.cgroup.release_version}}"
-    cgroup_enterprise_linux: "{{docker_cri.cgroup.enterprise_linux}}"
-    # download_url: "https://repo.almalinux.org/almalinux/{{cgroup_enterprise_linux}}/BaseOS/{{architecture}}/os/Packages/libcgroup-{{cgroup_release_version}}-19.el{{cgroup_enterprise_linux}}.{{architecture}}.rpm"
+ # vars:
+ #   architecture: "{{'aarch64' if ansible_architecture == 'aarch64' else 'x86_64'}}"
+ #  cgroup_release_version: "{{docker_cri.cgroup.release_version}}"
+ #   cgroup_enterprise_linux: "{{docker_cri.cgroup.enterprise_linux}}"
+ # download_url: "https://repo.almalinux.org/almalinux/{{cgroup_enterprise_linux}}/BaseOS/{{architecture}}/os/Packages/libcgroup-{{cgroup_release_version}}-19.el{{cgroup_enterprise_linux}}.{{architecture}}.rpm"
   tags:
     - setup
 
